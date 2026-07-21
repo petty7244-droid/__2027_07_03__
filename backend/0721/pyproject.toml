@@ -10,7 +10,6 @@ dependencies = [
     "pydantic>=2.13.4",
     "scikit-learn>=1.9.0",
     "uvicorn>=0.51.0",
-    "yfinance>=1.5.1",
 ]
 
 [dependency-groups]
