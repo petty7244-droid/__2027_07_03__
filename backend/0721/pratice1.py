@@ -35,7 +35,7 @@ with open("空氣品質aqi.json",encoding="utf-8") as file:
 contents:list[dict]= data['records']
 root = Root(sites=[AirSite(**item) for item in contents])
 
-
+#設節點
 @app.get("/")
 def read_root(aqi_min:int|None=None, aqi_max:int|None=None):
     results = root.sites
@@ -45,7 +45,7 @@ def read_root(aqi_min:int|None=None, aqi_max:int|None=None):
         results = [s for s in results if s.aqi <= aqi_max]
     return results
 
-@app.get("/county/{county_name}")
+@app.get("/county/{county_name}") 
 def specific_county(county_name:str):
     results = [site for site in root.sites if county_name == site.county]
     if not results:

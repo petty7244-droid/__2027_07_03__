@@ -4,7 +4,7 @@ from source import get_camera_position, CameraPosition #要從source將主程式
 
 app = FastAPI()
 
-#第一版
+# 第一版 ALL
 # @app.get("/")
 # def read_root():
 #     data:list[CameraPosition] = get_camera_position()
