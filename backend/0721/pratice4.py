@@ -17,7 +17,7 @@ app = FastAPI(
 
 
 # 定義查詢期間的列舉，繼承 str 以便 API 文件自動顯示字串值
-class StockPeriod(str, Enum):
+class    (str, Enum):
     """yfinance 支援的查詢期間。"""
 
     one_day = "1d"       # 1 天
