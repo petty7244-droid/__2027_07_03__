@@ -8,6 +8,7 @@ dependencies = [
     "fastapi[standard]>=0.139.2",
     "gradio>=6.20.0",
     "jupyter>=1.1.1",
+    "mglearn>=0.2.0",
     "pydantic>=2.13.4",
     "scikit-learn>=1.9.0",
     "uvicorn>=0.51.0",
