@@ -70,36 +70,42 @@ def train_and_save_model(
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    #關於模型
+    # 關於模型：依據傳入的 model_type 建立對應的演算法實例
     model_type_clean = model_type.strip()
     if model_type_clean.lower() == "lasso":
-        model = Lasso(alpha=alpha, random_state=random_state)
+        model = Lasso(alpha=alpha, random_state=random_state)   # Lasso：L1 正則化，會將不重要的係數壓成 0
         actual_model_name = f"Lasso 迴歸(α={alpha})"
         model_type_clean="Lasso"
     elif model_type_clean.lower() == "ridge":
-        model = Ridge(alpha=alpha, random_state=random_state)
+        model = Ridge(alpha=alpha, random_state=random_state)   # Ridge：L2 正則化，防止係數過大造成過擬合
         actual_model_name = f"Ridge 嶺迴歸(α={alpha})"
         model_type_clean="Ridge"
     else:
-        model = LinearRegression()
+        model = LinearRegression()                              # 一般最小平方法 OLS
         actual_model_name = "多元線性迴歸 (OLS)"
         model_type_clean="LinearRegression"
     
     print(f"開始訓練 {actual_model_name} (測試集比例:{test_size}, 隨機種子:{random_state})....")
+    # 使用「標準化後的訓練集」擬合模型
     model.fit(X_train_scaled, y_train)
     
+    # 計算總訓練耗時
     train_time = time.time() - start_time
 
     # ----------------------------------------------------------
     # 取得模型的權重,偏移值,評估值R2
     # ----------------------------------------------------------
+    # R²：用「標準化後的測試集」評估模型解釋力（越高越接近 1.0）
     r2 = model.score(X_test_scaled, y_test)
     
+    # 取出每個特徵對應的迴歸係數與截距
     coefs = model.coef_
     intercept = model.intercept_
+    # 將係數包裝成「特徵名稱 -> 係數」的字典，方便解讀與展示
     feature_coefs = {
         name: float(coef) for name, coef in zip(feature_names, coefs)
     }
+    # 整理所有要寫入 joblib 的資料：模型本體 + 三個預處理器 + 各項元數據
     model_data = {
     "model": model,
     "oe": oe,
@@ -119,8 +125,10 @@ def train_and_save_model(
     
     model_filename = os.path.join(current_dir, "salary_model.joblib")
     print(f"正在將模型、預處理器與元數據序列化並儲存至 {model_filename}...")
+    # 序列化儲存：之後 app.py / notebook 都能用 joblib.load() 直接載入使用
     joblib.dump(model_data,model_filename)
     print("模型儲存成功！")
+    # 回傳整理過的訓練結果摘要（提供給 API 前端顯示用）
     return{
         "status": "success",
         "r2": float(r2),
