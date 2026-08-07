@@ -6,6 +6,47 @@ from sklearn.preprocessing import OrdinalEncoder,OneHotEncoder,StandardScaler
 from sklearn.model_selection import train_test_split 
 from sklearn.linear_model import Lasso,LinearRegression
 import joblib
+from abc import ABC, abstractmethod
+
+class AbstractTestSize(ABC):
+    def __init__(self, value: float = 0.2):
+        self.value = self.validate(value)
+
+    @abstractmethod
+    def validate(self, value: float) -> float:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get(self) -> float:
+        raise NotImplementedError
+
+    @abstractmethod
+    def as_count(self, n_samples: int) -> int:
+        raise NotImplementedError
+
+
+class test_size(AbstractTestSize):
+    """
+    Validate and normalize the test split ratio.
+    """
+
+    def validate(self, value: float) -> float:
+        if not isinstance(value, (int, float)):
+            raise TypeError("test_size must be a number between 0.0 and 1.0")
+        normalized = float(value)
+        if not 0.0 < normalized < 1.0:
+            raise ValueError("test_size must be between 0.0 and 1.0 (exclusive)")
+        return normalized
+
+    def get(self) -> float:
+        return self.value
+
+    def as_count(self, n_samples: int) -> int:
+        if not isinstance(n_samples, int) or n_samples <= 0:
+            raise ValueError("n_samples must be a positive integer")
+        test_count = int(round(self.value * n_samples))
+        return max(1, min(test_count, n_samples - 1))
+
 
 def train_and_save_model(
     test_size:float = 0.2,
